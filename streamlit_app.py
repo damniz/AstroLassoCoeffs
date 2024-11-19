@@ -14,7 +14,7 @@ def plot_coefficients_lasso(reference_spectrum: np.array, label_name: str, model
     :param label_name: name of the label
     :param model: LassoCV model considered
     :param wavelengths_array: numpy array of wavelengths
-    :param trained_on_synth: boolean value is True if the model is trained on synthetic solar_spectrum
+    :param trained_on_synth: boolean value is True if the model is trained on synthetic spectra
     :param binning: binning size (positive float) - zero if no binning is applied
     :return: a Plotly graph object with the coefficients position and importance
     """
@@ -23,8 +23,12 @@ def plot_coefficients_lasso(reference_spectrum: np.array, label_name: str, model
     for i in ['/', '[', ']']:
         label_simple = label_simple.replace(i, '')
 
-    # Create coefficients dictionary
-    coeff_dict = {wavelength: coeff for wavelength, coeff in zip(wavelengths_array, model.coef_) if coeff > 1e-4}
+    # Create coefficients dictionary and ensure proper types
+    coeff_dict = {
+        float(wavelength): float(coeff)
+        for wavelength, coeff in zip(wavelengths_array, model.coef_)
+        if coeff > 1e-4
+    }
 
     # Create the primary stem plot for coefficients
     fig = go.Figure()
@@ -44,8 +48,8 @@ def plot_coefficients_lasso(reference_spectrum: np.array, label_name: str, model
     # Add the reference spectrum as a secondary line
     fig.add_trace(
         go.Scatter(
-            x=wavelengths_array,
-            y=reference_spectrum,
+            x=wavelengths_array.tolist(),  # Convert to a standard Python list
+            y=reference_spectrum.tolist(),  # Convert to a standard Python list
             mode="lines",
             line=dict(color="red", width=0.5, dash="solid"),
             opacity=0.5,
