@@ -18,20 +18,13 @@ def plot_coefficients_lasso(reference_spectrum: np.array, label_name: str, model
     :param binning: binning size (positive float) - zero if no binning is applied
     :return: a Plotly graph object with the coefficients position and importance
     """
+
     coeff_dict = {
         float(wavelength): float(coeff)
         for wavelength, coeff in zip(wavelengths_array, model.coef_)
         if coeff > 1e-4
     }
 
-    # Create coefficients dictionary and ensure proper types
-    coeff_dict = {
-        float(wavelength): float(coeff)
-        for wavelength, coeff in zip(wavelengths_array, model.coef_)
-        if coeff > 1e-4
-    }
-
-    # Create the primary stem plot for coefficients
     fig = go.Figure()
 
     fig.add_trace(
@@ -75,8 +68,8 @@ def plot_coefficients_lasso(reference_spectrum: np.array, label_name: str, model
 
     fig.add_trace(
         go.Scatter(
-            x=wavelengths_array.tolist(),  # Convert to a standard Python list
-            y=reference_spectrum.tolist(),  # Convert to a standard Python list
+            x=wavelengths_array.tolist(),
+            y=reference_spectrum.tolist(),
             mode="lines",
             line=dict(color="red", width=0.5, dash="solid"),
             opacity=0.5,
@@ -84,7 +77,6 @@ def plot_coefficients_lasso(reference_spectrum: np.array, label_name: str, model
         )
     )
 
-    # Update layout
     fig.update_layout(
         title=f"Lasso Coefficients for {label_name}",
         xaxis_title="Wavelength [\u00C5]",
@@ -116,8 +108,8 @@ if __name__ == "__main__":
     with tab1:
         for lab in obs_models.keys():
             if isinstance(obs_models[lab], LassoCV):
-                plot_placeholder_dict[f"{lab}_observed"] = plot_coefficients_lasso(solar_spectrum[-1], lab, obs_models[lab], w, trained_on_synth=False, binning=0)
+                plot_placeholder_dict[f"{lab}_observed"] = plot_coefficients_lasso(solar_spectrum, lab, obs_models[lab], w, trained_on_synth=False, binning=0)
     with tab2:
         for lab in synth_models.keys():
             if isinstance(synth_models[lab], LassoCV):
-                plot_placeholder_dict[f"{lab}_synthetic"] = plot_coefficients_lasso(solar_spectrum[-1], lab, synth_models[lab], w, trained_on_synth=True, binning=0)
+                plot_placeholder_dict[f"{lab}_synthetic"] = plot_coefficients_lasso(solar_spectrum, lab, synth_models[lab], w, trained_on_synth=True, binning=0)
