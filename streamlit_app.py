@@ -45,7 +45,7 @@ def plot_coefficients_lasso(solar_spectrum: np.array, label_name: str, model,
             y=list(coeff_dict.values()),
             mode='markers',
             marker=dict(color='black', size=5),
-            name='Markers'
+            name='Regressor'
         )
     )
 
