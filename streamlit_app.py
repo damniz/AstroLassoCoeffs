@@ -86,7 +86,7 @@ def plot_coefficients_lasso(solar_spectrum: np.array, label_name: str, model,
         width=800,
         height=400,
         showlegend=False,
-        xaxis=dict(showgrid=True),
+        xaxis=dict(showgrid=True, gridcolor='lightgrey'),
         yaxis=dict(showgrid=True)
     )
 
