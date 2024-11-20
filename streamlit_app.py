@@ -4,13 +4,14 @@ from sklearn.linear_model import LassoCV
 import numpy as np
 import plotly.graph_objects as go
 
+st.set_page_config(layout="wide", page_title="AstroLasso model regressors")
 
-def plot_coefficients_lasso(reference_spectrum: np.array, label_name: str, model,
+def plot_coefficients_lasso(solar_spectrum: np.array, label_name: str, model,
                             wavelengths_array: np.array, trained_on_synth: bool, binning: float):
     """
     Plots the coefficients of the considered lasso model using Plotly graph_objects.
 
-    :param reference_spectrum: array to be plotted as a line with a secondary y-axis
+    :param solar_spectrum: array to be plotted as a line with a secondary y-axis
     :param label_name: name of the label
     :param model: LassoCV model considered
     :param wavelengths_array: numpy array of wavelengths
@@ -27,15 +28,16 @@ def plot_coefficients_lasso(reference_spectrum: np.array, label_name: str, model
 
     fig = go.Figure()
 
-    fig.add_trace(
-        go.Scatter(
-            x=list(coeff_dict.keys()),
-            y=list(coeff_dict.values()),
-            mode="lines",
-            line=dict(color='black', width=1),
-            name='Stem Lines'
+    for wavelength, coeff in coeff_dict.items():
+        fig.add_trace(
+            go.Scatter(
+                x=[wavelength, wavelength],
+                y=[0, coeff],
+                mode="lines",
+                line=dict(color='black', width=1),
+                showlegend=False
+            )
         )
-    )
 
     fig.add_trace(
         go.Scatter(
@@ -57,59 +59,54 @@ def plot_coefficients_lasso(reference_spectrum: np.array, label_name: str, model
         )
     )
 
+    fig.add_trace(
+        go.Scatter(
+            x=wavelengths_array.tolist(),
+            y=solar_spectrum.tolist(),
+            mode="lines",
+            line=dict(color="red", width=0.5, dash="solid"),
+            opacity=0.5,
+            name="Solar spectrum",
+            yaxis="y2"
+        )
+    )
+
     fig.update_layout(
-        title=f'Stem Plot of Weight {label_name}',
-        xaxis_title='Wavelength [Å]',
-        yaxis_title=f'Weight {label_name}',
+        title=f"Regressors for {label_name} model",
+        xaxis_title="Wavelength [\u00C5]",
+        yaxis_title=f"Regressors",
+        yaxis2=dict(
+            title="Solar Spectrum",
+            overlaying="y",
+            side="right",
+            showgrid=False,
+            titlefont=dict(color="red"),
+        ),
+        template="plotly_white",
+        width=800,
+        height=400,
         showlegend=False,
         xaxis=dict(showgrid=True),
         yaxis=dict(showgrid=True)
     )
 
-    fig.add_trace(
-        go.Scatter(
-            x=wavelengths_array.tolist(),
-            y=reference_spectrum.tolist(),
-            mode="lines",
-            line=dict(color="red", width=0.5, dash="solid"),
-            opacity=0.5,
-            name="Solar spectrum",
-        )
-    )
-
-    fig.update_layout(
-        title=f"Lasso Coefficients for {label_name}",
-        xaxis_title="Wavelength [\u00C5]",
-        yaxis_title="Weight",
-        yaxis=dict(title=f"Weight {label_name}", side="left"),
-        yaxis2=dict(
-            title="Reference Spectrum",
-            overlaying="y",
-            side="right",
-            showgrid=False,
-        ),
-        template="plotly_white",
-        width=800,
-        height=400,
-    )
-
     return fig
 
-
-plot_placeholder_dict = {}
 w = np.load('data/uves_wavelength.npz')['wavelength']
 obs_models = joblib.load('models/lasso_models_dict_full_definition_obs.joblib')
 synth_models = joblib.load('models/lasso_models_dict_full_definition_synth.joblib')
 solar_spectrum = np.load("data/solar_spectrum.npy")
 
 if __name__ == "__main__":
-    labels = ["Lasso models trained on observed solar_spectrum", "Lasso models trained on synthetic solar_spectrum"]
+    labels = ["Models trained on OBSERVED spectra", "Models trained on SYNTHETIC spectra"]
     tab1, tab2 = st.tabs(labels)
     with tab1:
         for lab in obs_models.keys():
             if isinstance(obs_models[lab], LassoCV):
-                plot_placeholder_dict[f"{lab}_observed"] = plot_coefficients_lasso(solar_spectrum, lab, obs_models[lab], w, trained_on_synth=False, binning=0)
+                fig = plot_coefficients_lasso(solar_spectrum, lab, obs_models[lab], w, trained_on_synth=False, binning=0)
+                st.plotly_chart(fig, use_container_width=True)
     with tab2:
         for lab in synth_models.keys():
             if isinstance(synth_models[lab], LassoCV):
-                plot_placeholder_dict[f"{lab}_synthetic"] = plot_coefficients_lasso(solar_spectrum, lab, synth_models[lab], w, trained_on_synth=True, binning=0)
+                fig = plot_coefficients_lasso(solar_spectrum, lab, synth_models[lab], w, trained_on_synth=True, binning=0)
+                st.plotly_chart(fig, use_container_width=True)
