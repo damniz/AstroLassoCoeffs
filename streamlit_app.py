@@ -18,10 +18,11 @@ def plot_coefficients_lasso(reference_spectrum: np.array, label_name: str, model
     :param binning: binning size (positive float) - zero if no binning is applied
     :return: a Plotly graph object with the coefficients position and importance
     """
-    # Clean up label name
-    label_simple = label_name
-    for i in ['/', '[', ']']:
-        label_simple = label_simple.replace(i, '')
+    coeff_dict = {
+        float(wavelength): float(coeff)
+        for wavelength, coeff in zip(wavelengths_array, model.coef_)
+        if coeff > 1e-4
+    }
 
     # Create coefficients dictionary and ensure proper types
     coeff_dict = {
@@ -33,19 +34,45 @@ def plot_coefficients_lasso(reference_spectrum: np.array, label_name: str, model
     # Create the primary stem plot for coefficients
     fig = go.Figure()
 
-    # Add the coefficients as a "stem" plot
     fig.add_trace(
         go.Scatter(
             x=list(coeff_dict.keys()),
             y=list(coeff_dict.values()),
-            mode="markers+lines",
-            line=dict(color="black", width=1, dash="dot"),
-            marker=dict(size=8, color="black"),
-            name=f"Weight {label_name}",
+            mode="lines",
+            line=dict(color='black', width=1),
+            name='Stem Lines'
         )
     )
 
-    # Add the reference spectrum as a secondary line
+    fig.add_trace(
+        go.Scatter(
+            x=list(coeff_dict.keys()),
+            y=list(coeff_dict.values()),
+            mode='markers',
+            marker=dict(color='black', size=5),
+            name='Markers'
+        )
+    )
+
+    fig.add_trace(
+        go.Scatter(
+            x=list(coeff_dict.keys()),
+            y=[0] * len(coeff_dict),
+            mode='lines',
+            line=dict(color='black', width=0.5),
+            name='Baseline'
+        )
+    )
+
+    fig.update_layout(
+        title=f'Stem Plot of Weight {label_name}',
+        xaxis_title='Wavelength [Å]',
+        yaxis_title=f'Weight {label_name}',
+        showlegend=False,
+        xaxis=dict(showgrid=True),
+        yaxis=dict(showgrid=True)
+    )
+
     fig.add_trace(
         go.Scatter(
             x=wavelengths_array.tolist(),  # Convert to a standard Python list
