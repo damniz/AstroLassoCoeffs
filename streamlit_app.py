@@ -54,10 +54,10 @@ def plot_coefficients_lasso(solar_spectrum: np.array, label_name: str, model,
         fig.add_trace(
             go.Scatter(
                 x=[w, w],
-                y=[0, max(coeff_dict.values())],
+                y=[0, 1.1 * max(coeff_dict.values())],
                 mode='lines',
                 line=dict(color='green', width=0.5),
-                name='Moore rays',
+                name='Moore ray',
                 opacity=0.5,
                 hovertemplate=f"{element} : {w} \u00C5",
             ),
