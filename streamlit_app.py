@@ -100,7 +100,7 @@ w = np.load('data/uves_wavelength.npz')['wavelength']
 obs_models = joblib.load('models/lasso_models_dict_full_definition_obs.joblib')
 synth_models = joblib.load('models/lasso_models_dict_full_definition_synth.joblib')
 solar_spectrum = np.load("data/solar_spectrum.npy")
-moore_rays = pd.read_csv("data\ll_moore.dat", sep='\s+', names=['element', 'wavelength']).set_index('element')
+moore_rays = pd.read_csv("data/ll_moore.dat", sep='\s+', names=['element', 'wavelength']).set_index('element')
 moore_rays = moore_rays[(moore_rays.wavelength >= min(w)) & (moore_rays.wavelength <= max(w))]
 moore_dict = moore_rays.to_dict()['wavelength']
 
