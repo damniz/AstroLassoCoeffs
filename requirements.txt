@@ -1,5 +1,5 @@
 streamlit
 joblib
-scikit-learn
+scikit-learn==1.4.1.post1
 numpy
 plotly
