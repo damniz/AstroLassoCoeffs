@@ -24,7 +24,7 @@ def plot_coefficients_lasso(solar_spectrum: np.array, label_name: str, model,
     coeff_dict = {
         float(wavelength): float(coeff)
         for wavelength, coeff in zip(wavelengths_array, model.coef_)
-        if coeff > 1e-4
+        if abs(coeff) > 1e-4
     }
 
     fig = go.Figure()
