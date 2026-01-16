@@ -99,7 +99,7 @@ def plot_coefficients_lasso(ref_spectrum: np.array, label_name: str, model,
 w = np.load('data/uves_wavelength.npz')['wavelength']
 obs_models = joblib.load('models/lasso_models_dict_full_definition_obs.joblib')
 synth_models = joblib.load('models/lasso_models_dict_full_definition_synth.joblib')
-solar_spectrum = np.load("data/solar_spectrum.npy")
+solar_spectrum = np.load("data/solar_spectrum.npy")[0]
 synth_ref_spectrum = np.load("data/synth_ref_spectrum.npy")
 moore_rays = pd.read_csv("data/ll_moore.dat", sep='\s+', names=['element', 'wavelength'])
 moore_rays = moore_rays[(moore_rays.wavelength >= min(w)) & (moore_rays.wavelength <= max(w))]
