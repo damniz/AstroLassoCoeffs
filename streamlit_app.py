@@ -7,12 +7,12 @@ import plotly.graph_objects as go
 
 st.set_page_config(layout="wide", page_title="AstroLasso model regressors")
 
-def plot_coefficients_lasso(solar_spectrum: np.array, label_name: str, model,
+def plot_coefficients_lasso(ref_spectrum: np.array, label_name: str, model,
                             wavelengths_array: np.array, moore_rays: pd.DataFrame):
     """
     Plots the coefficients of the considered lasso model using Plotly graph_objects.
 
-    :param solar_spectrum: array to be plotted as a line with a secondary y-axis
+    :param ref_spectrum: array to be plotted as a line with a secondary y-axis
     :param label_name: name of the label
     :param model: LassoCV model considered
     :param wavelengths_array: numpy array of wavelengths
@@ -66,11 +66,11 @@ def plot_coefficients_lasso(solar_spectrum: np.array, label_name: str, model,
     fig.add_trace(
         go.Scatter(
             x=wavelengths_array.tolist(),
-            y=solar_spectrum.tolist(),
+            y=ref_spectrum.tolist(),
             mode="lines",
             line=dict(color="red", width=0.5, dash="solid"),
             opacity=0.5,
-            name="Solar spectrum",
+            name="Reference spectrum",
             yaxis="y2"
         )
     )
@@ -80,7 +80,7 @@ def plot_coefficients_lasso(solar_spectrum: np.array, label_name: str, model,
         xaxis_title="Wavelength [\u00C5]",
         yaxis_title=f"Regressors",
         yaxis2=dict(
-            title="Solar Spectrum",
+            title="Reference Spectrum",
             overlaying="y",
             side="right",
             showgrid=False,
@@ -100,6 +100,7 @@ w = np.load('data/uves_wavelength.npz')['wavelength']
 obs_models = joblib.load('models/lasso_models_dict_full_definition_obs.joblib')
 synth_models = joblib.load('models/lasso_models_dict_full_definition_synth.joblib')
 solar_spectrum = np.load("data/solar_spectrum.npy")
+synth_ref_spectrum = np.load("data/synth_ref_spectrum.npy")
 moore_rays = pd.read_csv("data/ll_moore.dat", sep='\s+', names=['element', 'wavelength'])
 moore_rays = moore_rays[(moore_rays.wavelength >= min(w)) & (moore_rays.wavelength <= max(w))]
 
@@ -114,5 +115,5 @@ if __name__ == "__main__":
     with tab2:
         for lab in synth_models.keys():
             if isinstance(synth_models[lab], LassoCV):
-                fig = plot_coefficients_lasso(solar_spectrum, lab, synth_models[lab], w, moore_rays)
+                fig = plot_coefficients_lasso(synth_ref_spectrum, lab, synth_models[lab], w, moore_rays)
                 st.plotly_chart(fig, use_container_width=True)
